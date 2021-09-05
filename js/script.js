@@ -39,6 +39,7 @@ window.addEventListener('DOMContentLoaded', () => {
     showTabContent();
 
     // Timer
+
     const deadLine = '2021-11-31';
 
     function getTimeRemaining(endtime) {
@@ -89,4 +90,37 @@ window.addEventListener('DOMContentLoaded', () => {
     }
  
     setClock('.timer', deadLine);
+
+    // Modal - window
+
+    const modalOpenBtns = document.querySelectorAll('[data-openmodal]'),
+          modal = document.querySelector('.modal'),
+          modalCloseBtn = document.querySelector('[data-closemodal]');
+
+    modalOpenBtns.forEach(btn  => {
+        btn.addEventListener('click', () => {
+            modal.classList.toggle('show');
+            document.body.style.overflow = 'hidden';            
+        });
+    });
+
+    function modalClose() {
+        modal.classList.toggle('show');
+        document.body.style.overflow = '';
+    }
+
+    modalCloseBtn.addEventListener('click', modalClose);
+
+    modal.addEventListener('click', event => {
+        if (event.target === modal) {
+            modalClose();
+        }
+    });
+
+    document.addEventListener('keydown', event => {
+        if (event.key === "Escape" && modal.classList.contains('show')) {
+            modalClose();
+        }
+    });
+
 });
