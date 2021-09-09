@@ -94,18 +94,17 @@ window.addEventListener('DOMContentLoaded', () => {
     // Modal window
 
     const modalOpenBtns = document.querySelectorAll('[data-openmodal]'),
-          modal = document.querySelector('.modal'),
-          modalCloseBtn = document.querySelector('[data-closemodal]');
+          modal = document.querySelector('.modal');
 
     function modalOpen() {
-        modal.classList.toggle('show');
+        modal.classList.add('show');
         document.body.style.overflow = 'hidden'; 
-        clearTimeout(modalTimeOpen);
+        clearInterval(modalTimeOpen);
         window.removeEventListener('scroll', modalByScroll);
     }   
 
     function modalClose() {
-        modal.classList.toggle('show');
+        modal.classList.remove('show');
         document.body.style.overflow = '';
     }
     
@@ -113,12 +112,11 @@ window.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', modalOpen);
     });
 
-    modalCloseBtn.addEventListener('click', modalClose);
-
     modal.addEventListener('click', event => {
-        if (event.target === modal) {
+        if (event.target === modal || event.target.classList.contains('modal__close')) {
             modalClose();
         }
+        console.log(event.target);
     });
 
     document.addEventListener('keydown', event => {
@@ -206,5 +204,81 @@ window.addEventListener('DOMContentLoaded', () => {
         3, 
         '.menu .container',        
     ).cardsAdd();   
+
+    // Form for sending to the server
+
+    const forms = document.querySelectorAll('form'),
+          message = {
+              loading: 'img/form/spinner.svg',
+              success: 'Спасибо! Скоро мы с вами свяжемся',
+              failure: 'Произошла ошибка...'
+          };
+
+    forms.forEach(item => {
+        console.log(item);
+        postData(item);
+    });
+
+    function postData(form) {
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            
+            const statusMessage = document.createElement('img');
+            statusMessage.src = message.loading;
+            statusMessage.style.cssText = `
+                display: block;
+                margin: 0 auto
+                `;
+            form.append(statusMessage);
+            form.insertAdjacentElement('afterend', statusMessage);
+
+            const request = new XMLHttpRequest();
+            request.open('POST', 'server.php');
+            request.setRequestHeader('Counter-type', 'application/json'); // 
+            const formData = new FormData(form);
+
+            const object = {}; //
+            formData.forEach((value, key) => { //
+                object[key] = value; //
+            }); //
+
+            const json = JSON.stringify(object); //
+            request.send(json); // formData
+                       
+            request.addEventListener('load', () => {
+                if (request.status === 200) {
+                    console.log(request.response);
+                    showThanksModal(message.success);
+                    form.reset();                   
+                    statusMessage.remove();
+                } else {
+                    showThanksModal(message.failure);
+                }
+            });
+        });
+    }
+
+    function showThanksModal(message) {
+        const modalDialog = document.querySelector('.modal__dialog');
+        modalDialog.classList.add('hide');
+        modalOpen();
+
+        const thanksModal = document.createElement('div');
+        thanksModal.classList.add('modal__dialog');
+        thanksModal.innerHTML = `
+            <div class="modal__content">
+                <div class="modal__close" data-closemodal>&times;</div>
+                <div class="modal__title">${message}</div>
+            </div>
+        `;
+
+        document.querySelector('.modal').append(thanksModal);
+        setTimeout(() => {            
+            thanksModal.remove();
+            modalDialog.classList.add('show');
+            modalDialog.classList.remove('hide');
+            modalClose();
+        },4000);
+    }
 
 });
