@@ -116,7 +116,6 @@ window.addEventListener('DOMContentLoaded', () => {
         if (event.target === modal || event.target.classList.contains('modal__close')) {
             modalClose();
         }
-        console.log(event.target);
     });
 
     document.addEventListener('keydown', event => {
@@ -215,7 +214,6 @@ window.addEventListener('DOMContentLoaded', () => {
           };
 
     forms.forEach(item => {
-        console.log(item);
         postData(item);
     });
 
@@ -229,31 +227,22 @@ window.addEventListener('DOMContentLoaded', () => {
                 display: block;
                 margin: 0 auto
                 `;
-            form.append(statusMessage);
             form.insertAdjacentElement('afterend', statusMessage);
-
-            const request = new XMLHttpRequest();
-            request.open('POST', 'server.php');
-            request.setRequestHeader('Counter-type', 'application/json'); // 
+          
             const formData = new FormData(form);
-
-            const object = {}; //
-            formData.forEach((value, key) => { //
-                object[key] = value; //
-            }); //
-
-            const json = JSON.stringify(object); //
-            request.send(json); // formData
-                       
-            request.addEventListener('load', () => {
-                if (request.status === 200) {
-                    console.log(request.response);
-                    showThanksModal(message.success);
-                    form.reset();                   
-                    statusMessage.remove();
-                } else {
-                    showThanksModal(message.failure);
-                }
+           
+            fetch('server.php', {
+                method: 'POST',
+                body: formData
+            }).then(data => data.text()
+            ).then(data => {
+                console.log(data);
+                showThanksModal(message.success);                  
+                statusMessage.remove();
+            }).catch(() => {
+                showThanksModal(message.failure);
+            }).finally(() => {
+                form.reset(); 
             });
         });
     }
@@ -280,5 +269,4 @@ window.addEventListener('DOMContentLoaded', () => {
             modalClose();
         },4000);
     }
-
 });
