@@ -346,14 +346,14 @@ window.addEventListener('DOMContentLoaded', () => {
         dotsArr.push(dot);
     }
 
-    indicators.addEventListener('click', event => {        
-        if (event.target && event.target.classList.contains('dot')) {
+    dotsArr.forEach(dot => {
+        dot.addEventListener('click', event => {
             offset = (event.target.getAttribute('data-slide-to') - 1) * widthNumber;
             slidesField.style.transform = `translateX(-${offset}px)`;
             
             currentSlider.textContent = event.target.getAttribute('data-slide-to');
             tapSlide();
-        }
+        });
     });
 });
 
