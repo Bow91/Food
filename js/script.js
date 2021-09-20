@@ -263,6 +263,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const buttonsSliderLeft = document.querySelector('.offer__slider-prev'),
           buttonsSliderRight = document.querySelector('.offer__slider-next'),
           slides = document.querySelectorAll('.offer__slide'),
+          slider = document.querySelector('.offer__slider'),
           currentSlider = document.querySelector('#current'),
           totalSlides = document.querySelector('#total'),
           slidesWrapper = document.querySelector('.offer__slider-wrapper'),
@@ -270,25 +271,25 @@ window.addEventListener('DOMContentLoaded', () => {
           width = window.getComputedStyle(slidesWrapper).width;
     
     let offset = 0;
+    const widthNumber = +width.slice(0, width.length - 2);
     currentSlider.textContent = '01';
 
-    console.log(width);
     slidesField.style.width = 100 * slides.length + '%';
     slidesField.style.display = 'flex';
     slidesField.style.transition = '0.6s ';
-
     slidesWrapper.style.overflow = 'hidden';
+    
+    slider.style.position = 'relative';
 
     slides.forEach(slide => {
         slide.style.width = width;
-    });
+    });   
 
     buttonsSliderRight.addEventListener('click', () => {
-        console.log('tik');
-        if (offset == +width.slice(0, width.length - 2) * (slides.length - 1)) {
+        if (offset == widthNumber * (slides.length - 1)) {
             offset = 0;
         } else {
-            offset += +width.slice(0, width.length - 2);
+            offset += widthNumber;
         }
         slidesField.style.transform = `translateX(-${offset}px)`;
         flipSlide(1);
@@ -296,9 +297,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
     buttonsSliderLeft.addEventListener('click', () => {
         if (offset == 0) {
-            offset = +width.slice(0, width.length - 2) * (slides.length - 1);
+            offset = widthNumber * (slides.length - 1);
         } else {
-            offset -= +width.slice(0, width.length - 2);
+            offset -= widthNumber;
         }
         slidesField.style.transform = `translateX(-${offset}px)`;
         flipSlide(-1);
@@ -310,7 +311,7 @@ window.addEventListener('DOMContentLoaded', () => {
         totalSlides.textContent = slides.length;
     }
     
-    function flipSlide (n){
+    function flipSlide(n){
         currentSlider.textContent = +currentSlider.textContent + n;
         if (currentSlider.textContent > slides.length) {
             currentSlider.textContent = 1;
@@ -318,10 +319,42 @@ window.addEventListener('DOMContentLoaded', () => {
         if (currentSlider.textContent < 1) {
             currentSlider.textContent = slides.length;
         }
+        tapSlide();
+    }
+
+    function tapSlide() {
         if (currentSlider.textContent < 10 && currentSlider.textContent.length < 2) {
             currentSlider.textContent = `0${currentSlider.textContent}`;
         }
+        dotsArr.forEach(dot => dot.style.opacity = 0.5);
+        dotsArr[+currentSlider.textContent - 1].style.opacity = 1;
     }
+
+    const indicators = document.createElement('ol'),
+          dotsArr = [];
+    indicators.classList.add('carousel-indicators');
+    slider.append(indicators);
+
+    for (let i = 1; i <= slides.length; i++) {
+        const dot = document.createElement('li');
+        dot.setAttribute('data-slide-to', i);
+        dot.classList.add('dot');
+        if (i == +currentSlider.textContent) {
+            dot.style.opacity = 1;
+        }
+        indicators.append(dot);
+        dotsArr.push(dot);
+    }
+
+    indicators.addEventListener('click', event => {        
+        if (event.target && event.target.classList.contains('dot')) {
+            offset = (event.target.getAttribute('data-slide-to') - 1) * widthNumber;
+            slidesField.style.transform = `translateX(-${offset}px)`;
+            
+            currentSlider.textContent = event.target.getAttribute('data-slide-to');
+            tapSlide();
+        }
+    });
 });
 
 //npx json-server --watch db.json
