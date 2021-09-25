@@ -535,6 +535,12 @@ a {
 .footer .subtitle {
     font-size:20px
 }
+.footer a img {
+    width: 25px;
+    height: auto;
+    vertical-align: middle;
+    filter: invert(1);  
+}
 .footer .link {
     display:block;
     margin-top:15px;
