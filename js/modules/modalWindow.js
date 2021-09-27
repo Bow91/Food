@@ -1,45 +1,44 @@
-function modalWindow() {
-    const modalOpenBtns = document.querySelectorAll('[data-openmodal]'),
-          modal = document.querySelector('.modal');
-
-    function modalOpen() {
-        modal.classList.add('show');
-        document.body.style.overflow = 'hidden'; 
+function modalOpen(modalSelector, modalTimeOpen, modalByScroll) {
+    const modal = document.querySelector(modalSelector);    
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden'; 
+    if (modalTimeOpen) {
         clearInterval(modalTimeOpen);
-        window.removeEventListener('scroll', modalByScroll);
-    }   
-
-    function modalClose() {
-        modal.classList.remove('show');
-        document.body.style.overflow = '';
     }
-    
+    window.removeEventListener('scroll', modalByScroll);
+}   
+
+function modalClose(modalSelector) {
+    const modal = document.querySelector(modalSelector);
+    modal.classList.remove('show');
+    document.body.style.overflow = '';
+}
+
+function modalWindow(dataSelector, modalSelector, modalTimeOpen, modalByScroll) {
+    const modalOpenBtns = document.querySelectorAll(dataSelector),
+          modal = document.querySelector(modalSelector);
+
+
     modalOpenBtns.forEach(btn  => {
-        btn.addEventListener('click', modalOpen);
+        btn.addEventListener('click', () => {
+            modalOpen(modalSelector, modalTimeOpen);
+            window.removeEventListener('scroll', modalByScroll);
+        });
     });
 
     modal.addEventListener('click', event => {
         if (event.target === modal || event.target.classList.contains('modal__close')) {
-            modalClose();
+            modalClose(modalSelector);
         }
     });
 
     document.addEventListener('keydown', event => {
         if (event.key === "Escape" && modal.classList.contains('show')) {
-            modalClose();
+            modalClose(modalSelector);
         }
     });
 
-    const modalTimeOpen = setTimeout(modalOpen, 15000);
-
-    function modalByScroll()  {
-        const ddE = document.documentElement; 
-        if (ddE.scrollTop == (ddE.scrollHeight - ddE.clientHeight)) {
-            modalOpen();
-            window.removeEventListener('scroll', modalByScroll);
-        }
-    }
-
     window.addEventListener('scroll', modalByScroll);
 }
-module.exports = modalWindow;
+export default modalWindow;
+export {modalOpen, modalClose};

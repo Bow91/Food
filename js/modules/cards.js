@@ -47,4 +47,4 @@ function cards() {
     ).cardsAdd()));
      
 }
-module.exports = cards;
+export default cards;

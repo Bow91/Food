@@ -1,5 +1,5 @@
-function timer() {
-    const deadLine = '2021-11-31';
+function timer(idSelector, deadLineTimer) {
+    const deadLine = deadLineTimer;
 
     function getTimeRemaining(endtime) {
         const time = Date.parse(endtime) - new Date(),
@@ -48,6 +48,6 @@ function timer() {
         updateClock();  
     }
  
-    setClock('.timer', deadLine);
+    setClock(idSelector, deadLine);
 }
-module.exports = timer;
+export default timer;
